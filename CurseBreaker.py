@@ -7,12 +7,14 @@ import shutil
 import pickle
 import requests
 import traceback
+import termios, fcntl
 from tqdm import tqdm
 from pathlib import Path
-from terminaltables import SingleTable
+from terminaltables import AsciiTable
 from prompt_toolkit import PromptSession, HTML, ANSI, print_formatted_text as printft
 from prompt_toolkit.completion import WordCompleter
 from distutils.version import StrictVersion
+from select import select
 from CB import AC, HEADERS, __version__
 from CB.Core import Core
 from CB.WeakAura import WeakAuraUpdater
@@ -88,8 +90,9 @@ class TUI:
             starttime = time.time()
             keypress = None
             while True:
-#                if msvcrt.kbhit():
-#                    keypress = msvcrt.getch()
+                if self.kbhit():
+                    keypress = self.getch()
+                    break
                 if time.time() - starttime > 5:
                     break
             if not keypress:
@@ -216,7 +219,7 @@ class TUI:
     def setup_table(self):
         self.tableData = [[f'{AC.LIGHTWHITE_EX}Status{AC.RESET}', f'{AC.LIGHTWHITE_EX}Name{AC.RESET}',
                            f'{AC.LIGHTWHITE_EX}Version{AC.RESET}']]
-        self.table = SingleTable(self.tableData)
+        self.table = AsciiTable(self.tableData)
         self.table.justify_columns[0] = 'center'
 
     def c_install(self, args):
@@ -465,6 +468,27 @@ class TUI:
     def c_exit(self, _):
         sys.exit(0)
 
+    def kbhit(self):
+        fd = sys.stdin.fileno()
+        oldterm = termios.tcgetattr(fd)
+        newattr = termios.tcgetattr(fd)
+        newattr[3] = newattr[3] & ~termios.ICANON & ~termios.ECHO
+        termios.tcsetattr(fd, termios.TCSANOW, newattr)
+        oldflags = fcntl.fcntl(fd, fcntl.F_GETFL)
+        fcntl.fcntl(fd, fcntl.F_SETFL, oldflags | os.O_NONBLOCK)
+        try:
+            while True:
+                try:
+                    c = sys.stdin.read(1)
+                    return True
+                except IOError:
+                    return False
+        finally:
+            termios.tcsetattr(fd, termios.TCSAFLUSH, oldterm)
+            fcntl.fcntl(fd, fcntl.F_SETFL, oldflags)
+
+    def getch(self):
+        return sys.stdin.read(1)
 
 if __name__ == '__main__':
     if getattr(sys, 'frozen', False):
