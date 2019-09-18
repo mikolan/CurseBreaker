@@ -16,7 +16,7 @@ from .Tukui import TukuiAddon
 from .GitLab import GitLabAddon
 from .CurseForge import CurseForgeAddon
 from .WoWInterface import WoWInterfaceAddon
-
+from .GitHub import GitHubAddon
 
 class Core:
     def __init__(self):
@@ -128,6 +128,8 @@ class Core:
             if self.clientType == 'wow_retail' or url.endswith('1') or url.endswith('2'):
                 raise RuntimeError('Incorrect client version.')
             return TukuiAddon(url, True)
+        elif url.startswith('https://github.com/'):
+            return GitHubAddon(url)
         elif url.lower() == 'elvui':
             if self.clientType == 'wow_retail':
                 return GitLabAddon('ElvUI', '60', 'elvui/elvui', 'master')
