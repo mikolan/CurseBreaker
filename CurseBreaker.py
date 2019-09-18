@@ -3,7 +3,6 @@ import io
 import sys
 import time
 import gzip
-import msvcrt
 import shutil
 import pickle
 import requests
@@ -13,7 +12,6 @@ from pathlib import Path
 from terminaltables import SingleTable
 from prompt_toolkit import PromptSession, HTML, ANSI, print_formatted_text as printft
 from prompt_toolkit.completion import WordCompleter
-from ctypes import windll, wintypes, byref
 from distutils.version import StrictVersion
 from CB import AC, HEADERS, __version__
 from CB.Core import Core
@@ -29,21 +27,19 @@ class TUI:
         self.cfSlugs = None
         self.wowiSlugs = None
         self.completer = None
-        self.chandle = windll.kernel32.GetStdHandle(-11)
         sys.tracebacklimit = 0
 
     def start(self):
-        self.setup_console()
+#        self.setup_console()
         self.print_header()
         # Check if executable is in good location
         if not os.path.isfile('Wow.exe') or not os.path.isdir(Path('Interface/AddOns')) or \
                 not os.path.isdir('WTF'):
             printft(HTML('<ansibrightred>This executable should be placed in the same directory where Wow.exe is locate'
                          'd.</ansibrightred>\n'))
-            os.system('pause')
             sys.exit(1)
         # Detect Classic client
-        if os.path.basename(os.path.dirname(sys.executable)) == '_classic_':
+        if os.path.basename(os.getcwd()) == '_classic_':
             self.core.clientType = 'wow_classic'
         # Check if client have write access
         try:
@@ -53,9 +49,7 @@ class TUI:
         except IOError:
             printft(HTML('<ansibrightred>CurseBreaker doesn\'t have write rights for the current directory.\n'
                          'Try starting it with administrative privileges.</ansibrightred>\n'))
-            os.system('pause')
             sys.exit(1)
-        self.auto_update()
         self.core.init_config()
         self.setup_table()
         # Curse URI Support
@@ -94,10 +88,9 @@ class TUI:
             starttime = time.time()
             keypress = None
             while True:
-                if msvcrt.kbhit():
-                    keypress = msvcrt.getch()
-                    break
-                elif time.time() - starttime > 5:
+#                if msvcrt.kbhit():
+#                    keypress = msvcrt.getch()
+                if time.time() - starttime > 5:
                     break
             if not keypress:
                 if len(self.core.config['Addons']) > 35:
@@ -115,7 +108,6 @@ class TUI:
                 except Exception as e:
                     self.handle_exception(e)
                 printft('')
-                os.system('pause')
                 sys.exit(0)
         self.setup_completer()
         self.setup_console(True)
@@ -161,11 +153,9 @@ class TUI:
                         f.write(payload.content)
                     printft(HTML(f'<ansibrightgreen>Update complete! Please restart the application.</ansibrightgreen'
                                  f'>\n\n<ansigreen>Changelog:</ansigreen>\n{changelog}\n'))
-                    os.system('pause')
                     sys.exit(0)
             except Exception as e:
                 printft(HTML(f'<ansibrightred>Update failed!\n\nReason: {str(e)}</ansibrightred>\n'))
-                os.system('pause')
                 sys.exit(1)
 
     def handle_exception(self, e):
@@ -178,7 +168,7 @@ class TUI:
             traceback.print_exc()
 
     def print_header(self):
-        os.system('cls')
+        os.system('clear')
         printft(HTML(f'<ansibrightblack>~~~ <ansibrightgreen>CurseBreaker</ansibrightgreen> <ansibrightred>v'
                      f'{__version__}</ansibrightred> ~~~</ansibrightblack>\n'))
 
