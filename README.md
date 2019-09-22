@@ -1,7 +1,5 @@
 # CurseBreaker
 
-![GitHub release](https://img.shields.io/github/release/AcidWeb/CurseBreaker) ![AppVeyor](https://img.shields.io/appveyor/ci/AcidWeb/cursebreaker) ![GitHub Releases](https://img.shields.io/github/downloads/AcidWeb/CurseBreaker/latest/total) ![GitHub All Releases](https://img.shields.io/github/downloads/AcidWeb/CurseBreaker/total)
-
 CLI addon updater for World of Warcraft.
 
 ![Screenshot](https://i.imgur.com/RQBNS4y.png)
@@ -10,7 +8,7 @@ CLI addon updater for World of Warcraft.
 The latest release can be found [here](https://github.com/AcidWeb/CurseBreaker/releases/latest).
 
 ## USAGE
-Should be pretty self-explanatory. Place **CurseBreaker** EXE inside directory containing `Wow.exe` and start it up.\
+Run CurseBreaker from the directory containing `Wow.exe`.
 Already installed addons will not be recognized by **CurseBreaker** and they need to be reinstalled.\
 Both _Retail_ and _Classic_ clients are supported. The client version is detected automatically.\
 By default **CurseBreaker** create backups of entire `WTF` directory.
@@ -22,6 +20,7 @@ By default **CurseBreaker** create backups of entire `WTF` directory.
 ## SUPPORTED URL
 - CurseForge: `https://www.curseforge.com/wow/addons/[addon_name]`, `cf:[addon_name]`
 - WoWInterface: `https://www.wowinterface.com/downloads/[addon_name]`, `wowi:[addon_id]`
+- GitHub: `https://github.com/[owner]/[repo]`
 - Tukui: `https://www.tukui.org/addons.php?id=[addon_id]`, `https://www.tukui.org/classic-addons.php?id=[addon_id]`
 - Tukui GitLab: `ElvUI`, `ElvUI:Dev`, `Tukui`
 - Wago: **CurseBreaker** can update auras like WeakAuras Companion.
