@@ -30,7 +30,10 @@ class GitHubAddon:
     @retry()
     def get_addon(self):
         self.archive = zipfile.ZipFile(io.BytesIO(requests.get(self.downloadUrl, headers=HEADERS).content))
+        self.githubfoldername, tocfilename = next(p for p in self.archive.namelist() if p.endswith('toc')).split('/')
+        self.realfoldername = tocfilename.split('.')[0]
         for file in self.archive.namelist():
+            file = file.replace(self.githubfoldername, self.realfoldername)
             if '/' not in os.path.dirname(file):
                 self.directories.append(os.path.dirname(file))
         self.directories = list(set(self.directories))
@@ -38,3 +41,4 @@ class GitHubAddon:
     def install(self, path):
         self.get_addon()
         self.archive.extractall(path)
+        shutil.move(f'{path}/{self.githubfoldername}', f'{path}/{self.realfoldername}')
